@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raio-X Estratégico — Decodificando o 2º Dia do ENEM (Ciências da Natureza)</title>
+<meta name="description" content="Dashboard Analítico & Estudo de Caso Integrado (Biologia, Química e Física) para o 2º dia do ENEM.">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/lucide@0.462.0/dist/umd/lucide.min.js"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: { extend: {
+    colors: {
+      brand: {50:'#eef6ff',100:'#d9eaff',500:'#2563eb',600:'#1d4ed8',700:'#1e40af',900:'#0b1f4d'},
+      heat:{red:'#D9534F',orange:'#F0AD4E',yellow:'#FFD166',green:'#5CB85C'}
+    },
+    fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+  }}
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body{font-family:'Inter',system-ui,sans-serif}
+  .card{ @apply bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm; }
+  .tab-btn{ @apply px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition whitespace-nowrap; }
+  .tab-btn.active{ @apply bg-brand-600 text-white shadow-md shadow-brand-600/30; }
+  .heat-card{transition:transform .18s ease, box-shadow .18s ease}
+  .heat-card:hover{transform:translateY(-4px);box-shadow:0 12px 28px -8px rgb(0 0 0/.25)}
+  .fade-in{animation:fadeIn .35s ease both}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .alt-btn{ @apply w-full text-left px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 hover:border-brand-500 hover:bg-brand-50 dark:hover:bg-slate-700/50 transition text-sm; }
+  .alt-btn.correct{ @apply border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30; }
+  .alt-btn.wrong{ @apply border-rose-500 bg-rose-50 dark:bg-rose-900/30; }
+  ::-webkit-scrollbar{height:8px;width:8px}::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:8px}
+</style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen">
+
+<!-- ============ HEADER ============ -->
+<header class="bg-gradient-to-r from-brand-900 via-brand-700 to-brand-600 text-white">
+  <div class="max-w-7xl mx-auto px-4 py-8 md:py-10">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div class="max-w-3xl">
+        <div class="flex items-center gap-2 text-brand-100 text-xs font-semibold uppercase tracking-widest mb-2">
+          <i data-lucide="radar" class="w-4 h-4"></i> Trilha de Aprendizagem · ENEM 2º Dia
+        </div>
+        <h1 class="text-2xl md:text-4xl font-extrabold leading-tight">Raio-X Estratégico — Decodificando o 2º Dia do ENEM</h1>
+        <p class="mt-2 text-brand-100 text-sm md:text-base">Dashboard Analítico &amp; Estudo de Caso Integrado <span class="opacity-80">(Biologia, Química e Física) · Ciências da Natureza e suas Tecnologias</span></p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="darkToggle" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl px-3 py-2 text-sm font-semibold transition">
+          <i data-lucide="moon" class="w-4 h-4"></i><span class="hidden sm:inline">Tema</span>
+        </button>
+        <a href="checklist.html" class="flex items-center gap-2 bg-white text-brand-700 hover:bg-brand-50 rounded-xl px-3 py-2 text-sm font-bold transition">
+          <i data-lucide="printer" class="w-4 h-4"></i><span class="hidden sm:inline">Checklist PDF</span>
+        </a>
+      </div>
+    </div>
+    <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+      <div class="bg-white/10 border border-white/15 rounded-xl px-3 py-3"><p class="text-2xl font-extrabold">45</p><p class="text-[11px] uppercase tracking-wide text-brand-100">Questões de CN</p></div>
+      <div class="bg-white/10 border border-white/15 rounded-xl px-3 py-3"><p class="text-2xl font-extrabold">2015–2025</p><p class="text-[11px] uppercase tracking-wide text-brand-100">Série histórica</p></div>
+      <div class="bg-white/10 border border-white/15 rounded-xl px-3 py-3"><p class="text-2xl font-extrabold">~3 min</p><p class="text-[11px] uppercase tracking-wide text-brand-100">Média por questão</p></div>
+      <div class="bg-white/10 border border-white/15 rounded-xl px-3 py-3"><p class="text-2xl font-extrabold">TRI</p><p class="text-[11px] uppercase tracking-wide text-brand-100">Coerência pedagógica</p></div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ TAB NAV ============ -->
+<nav class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-700">
+  <div class="max-w-7xl mx-auto px-4 py-2 flex gap-1 overflow-x-auto">
+    <button class="tab-btn active" data-tab="dashboard"><span class="inline-flex items-center gap-2"><i data-lucide="bar-chart-3" class="w-4 h-4"></i>Dashboard Analítico</span></button>
+    <button class="tab-btn" data-tab="estudo"><span class="inline-flex items-center gap-2"><i data-lucide="droplets" class="w-4 h-4"></i>Estudo de Caso: Água</span></button>
+    <button class="tab-btn" data-tab="desafio"><span class="inline-flex items-center gap-2"><i data-lucide="puzzle" class="w-4 h-4"></i>Desafio Think-Pair-Share</span></button>
+    <button class="tab-btn" data-tab="checklist"><span class="inline-flex items-center gap-2"><i data-lucide="clipboard-check" class="w-4 h-4"></i>Checklist &amp; Dicas TRI</span></button>
+  </div>
+</nav>
+
+<main class="max-w-7xl mx-auto px-4 py-8">
+
+<!-- ============ TAB 1: DASHBOARD ============ -->
+<section id="tab-dashboard" class="tab-panel fade-in space-y-8">
+
+  <!-- Painel 1: Rosca -->
+  <div class="grid md:grid-cols-5 gap-6">
+    <div class="card p-6 md:col-span-2">
+      <h2 class="flex items-center gap-2 text-lg font-bold mb-1"><i data-lucide="chart-pie" class="w-5 h-5 text-brand-600"></i>Panorama Geral da Prova</h2>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Proporcionalidade de questões por componente · ENEM 2015–2025</p>
+      <div class="relative h-64"><canvas id="chartRosca"></canvas></div>
+      <p class="mt-4 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">Distribuição equilibrada: <strong>15 questões</strong> de cada componente nas 45 de Ciências da Natureza. Nenhuma área pode ser negligenciada.</p>
+    </div>
+
+    <!-- Painel 3: TRI -->
+    <div class="card p-6 md:col-span-3">
+      <h2 class="flex items-center gap-2 text-lg font-bold mb-1"><i data-lucide="target" class="w-5 h-5 text-brand-600"></i>Matriz Nível de Dificuldade × TRI</h2>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">A régua de coerência pedagógica: acertar difíceis e errar fáceis gera penalização por inconsistência (suspeita de chute).</p>
+      <div class="relative h-64"><canvas id="chartTRI"></canvas></div>
+      <div class="mt-4 grid sm:grid-cols-3 gap-3 text-xs">
+        <div class="flex items-start gap-2 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl p-3"><i data-lucide="shield-check" class="w-4 h-4 text-emerald-600 mt-0.5"></i><span><strong>Fáceis (~30%):</strong> Zona de garantia. Errar aqui derruba sua régua TRI.</span></div>
+        <div class="flex items-start gap-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-3"><i data-lucide="flag" class="w-4 h-4 text-amber-600 mt-0.5"></i><span><strong>Médias (~50%):</strong> Maior ganho de pontuação. Prioridade máxima de execução.</span></div>
+        <div class="flex items-start gap-2 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-xl p-3"><i data-lucide="alert-triangle" class="w-4 h-4 text-rose-600 mt-0.5"></i><span><strong>Difíceis (~20%):</strong> Resolva por último. Chutar com coerência &gt; perder tempo.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Painel 2: Mapa de Calor -->
+  <div class="card p-6">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-1">
+      <h2 class="flex items-center gap-2 text-lg font-bold"><i data-lucide="flame" class="w-5 h-5 text-heat-red"></i>Mapa de Calor Temático (Frequência Relativa)</h2>
+      <div class="flex gap-2" id="heatFilters">
+        <button data-f="Todas" class="hf-btn active text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600">Todas</button>
+        <button data-f="Biologia" class="hf-btn text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600">🧬 Biologia</button>
+        <button data-f="Química" class="hf-btn text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600">⚗️ Química</button>
+        <button data-f="Física" class="hf-btn text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600">⚡ Física</button>
+      </div>
+    </div>
+    <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Clique em um tema para ver as competências BNCC/ENEM associadas. Intensidade da cor = frequência relativa de cobrança.</p>
+    <div class="flex flex-wrap gap-3 mb-4 text-[11px] font-semibold">
+      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded" style="background:#D9534F"></span>Muito Alta</span>
+      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded" style="background:#F0AD4E"></span>Alta</span>
+      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded" style="background:#FFD166"></span>Média</span>
+      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded" style="background:#5CB85C"></span>Baixa</span>
+    </div>
+    <div id="heatGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+  </div>
+
+  <!-- Modal competências -->
+  <div id="heatModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div class="card max-w-lg w-full p-6 fade-in">
+      <div class="flex items-start justify-between gap-4">
+        <div><p id="hmDisc" class="text-xs font-bold uppercase tracking-widest text-brand-600"></p>
+        <h3 id="hmTitle" class="text-lg font-extrabold mt-1"></h3></div>
+        <button id="hmClose" class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <p id="hmSub" class="text-sm font-semibold text-slate-600 dark:text-slate-300 mt-2"></p>
+      <div class="mt-3 flex items-center gap-2 text-xs font-bold"><span id="hmFreq" class="px-2 py-1 rounded-lg"></span><span id="hmComp" class="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-700"></span></div>
+      <p id="hmDesc" class="mt-4 text-sm leading-relaxed text-slate-600 dark:text-slate-300"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TAB 2: ESTUDO DE CASO ETA ============ -->
+<section id="tab-estudo" class="tab-panel hidden space-y-8">
+  <div class="card p-6 bg-gradient-to-br from-cyan-50 to-brand-50 dark:from-slate-800 dark:to-slate-800">
+    <h2 class="flex items-center gap-2 text-xl font-extrabold"><i data-lucide="factory" class="w-6 h-6 text-cyan-600"></i>Estudo de Caso Integrado — Estação de Tratamento de Água (ETA)</h2>
+    <p class="mt-2 text-sm text-slate-600 dark:text-slate-300 leading-relaxed"><strong>Situação-problema:</strong> um município próximo a um polo industrial e agrícola registrou aumento de casos de amebíase e gastroenterite, com episódios recorrentes de proliferação de algas (eutrofização) no reservatório principal. A concessionária precisa otimizar o tratamento e adotar práticas de Química Verde para a destinação de efluentes.</p>
+  </div>
+
+  <!-- Fluxo ETA -->
+  <div class="grid md:grid-cols-3 gap-5">
+    <div class="card p-6 border-t-4 border-t-purple-500">
+      <div class="flex items-center justify-between"><span class="text-xs font-black text-purple-600 uppercase tracking-widest">Etapa 1 · Química</span><i data-lucide="flask-conical" class="w-6 h-6 text-purple-500"></i></div>
+      <h3 class="text-lg font-extrabold mt-2">Coagulação &amp; Floculação</h3>
+      <p class="text-sm mt-2 text-slate-600 dark:text-slate-300 leading-relaxed">Adição de <strong>sulfato de alumínio</strong> e <strong>hidróxido de cálcio</strong>: anulação das cargas elétricas das partículas em suspensão, formação de flocos gelatinosos e ajuste de pH.</p>
+      <div class="mt-4 space-y-2 text-xs">
+        <div class="flex gap-2"><i data-lucide="atom" class="w-4 h-4 text-purple-500 shrink-0"></i>Interações intermoleculares e hidrólise de sais</div>
+        <div class="flex gap-2"><i data-lucide="scale" class="w-4 h-4 text-purple-500 shrink-0"></i>Hidrólise: Al₂(SO₄)₃ + Ca(OH)₂ → flocos de Al(OH)₃</div>
+        <div class="flex gap-2"><i data-lucide="leaf" class="w-4 h-4 text-purple-500 shrink-0"></i>Química Verde: descarte sustentável de efluentes</div>
+      </div>
+      <button class="eta-q mt-4 text-xs font-bold text-purple-600 hover:underline" data-q="1">→ Ver questão relacionada (Fácil)</button>
+    </div>
+    <div class="card p-6 border-t-4 border-t-blue-500">
+      <div class="flex items-center justify-between"><span class="text-xs font-black text-blue-600 uppercase tracking-widest">Etapa 2 · Física</span><i data-lucide="arrow-down-to-line" class="w-6 h-6 text-blue-500"></i></div>
+      <h3 class="text-lg font-extrabold mt-2">Decantação</h3>
+      <p class="text-sm mt-2 text-slate-600 dark:text-slate-300 leading-relaxed">Sedimentação dos flocos pela ação da <strong>gravidade</strong> e diferença de <strong>densidade</strong> entre o floco e o meio aquoso, em tanque sem agitação.</p>
+      <div class="mt-4 space-y-2 text-xs">
+        <div class="flex gap-2"><i data-lucide="weight" class="w-4 h-4 text-blue-500 shrink-0"></i>Peso &gt; Empuxo → o floco afunda (d_floco &gt; d_água)</div>
+        <div class="flex gap-2"><i data-lucide="gauge" class="w-4 h-4 text-blue-500 shrink-0"></i>Velocidade limite de sedimentação (equilíbrio de forças)</div>
+        <div class="flex gap-2"><i data-lucide="layers" class="w-4 h-4 text-blue-500 shrink-0"></i>Separação mecânica de fases sólido-líquido</div>
+      </div>
+      <button class="eta-q mt-4 text-xs font-bold text-blue-600 hover:underline" data-q="1">→ Ver questão relacionada (Fácil)</button>
+    </div>
+    <div class="card p-6 border-t-4 border-t-emerald-500">
+      <div class="flex items-center justify-between"><span class="text-xs font-black text-emerald-600 uppercase tracking-widest">Etapa 3 · Biologia</span><i data-lucide="bug" class="w-6 h-6 text-emerald-500"></i></div>
+      <h3 class="text-lg font-extrabold mt-2">Desinfecção &amp; Cloração</h3>
+      <p class="text-sm mt-2 text-slate-600 dark:text-slate-300 leading-relaxed">Inativação e destruição de estruturas celulares de patógenos (vírus, bactérias e protozoários como <em>Giardia</em> e <em>Entamoeba</em>), prevenindo parasitoses.</p>
+      <div class="mt-4 space-y-2 text-xs">
+        <div class="flex gap-2"><i data-lucide="shield-plus" class="w-4 h-4 text-emerald-500 shrink-0"></i>Saneamento básico = saúde pública (prevenção de amebíase/giardíase)</div>
+        <div class="flex gap-2"><i data-lucide="waves" class="w-4 h-4 text-emerald-500 shrink-0"></i>Controle de eutrofização por excesso de matéria orgânica</div>
+        <div class="flex gap-2"><i data-lucide="microscope" class="w-4 h-4 text-emerald-500 shrink-0"></i>Cloro oxida membranas e enzimas celulares</div>
+      </div>
+      <button class="eta-q mt-4 text-xs font-bold text-emerald-600 hover:underline" data-q="2">→ Ver questão relacionada (Média)</button>
+    </div>
+  </div>
+
+  <!-- Eutrofização passo a passo -->
+  <div class="card p-6">
+    <h3 class="flex items-center gap-2 text-lg font-bold mb-4"><i data-lucide="workflow" class="w-5 h-5 text-brand-600"></i>Cadeia da Eutrofização Antropogênica (clique em cada etapa)</h3>
+    <div class="flex flex-col lg:flex-row gap-3 items-stretch" id="eutroChain"></div>
+  </div>
+</section>
+
+<!-- ============ TAB 3: THINK-PAIR-SHARE ============ -->
+<section id="tab-desafio" class="tab-panel hidden space-y-8">
+  <div class="card p-6">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h2 class="flex items-center gap-2 text-xl font-extrabold"><i data-lucide="timer" class="w-6 h-6 text-brand-600"></i>Simulação Think-Pair-Share</h2>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Think (2 min) → Pair (3 min) → Share (2 min). Use o cronômetro e responda antes de revelar o gabarito.</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="text-center"><div id="timerDisplay" class="text-3xl font-black tabular-nums text-brand-600">02:00</div><div id="timerPhase" class="text-[11px] font-bold uppercase tracking-widest text-slate-500">Think</div></div>
+        <div class="flex flex-col gap-1.5">
+          <button id="timerStart" class="px-4 py-1.5 rounded-lg bg-brand-600 text-white text-xs font-bold hover:bg-brand-700">▶ Iniciar</button>
+          <div class="flex gap-1.5">
+            <button class="phase-btn px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-600 text-[11px] font-bold" data-min="2" data-phase="Think">Think</button>
+            <button class="phase-btn px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-600 text-[11px] font-bold" data-min="3" data-phase="Pair">Pair</button>
+            <button class="phase-btn px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-600 text-[11px] font-bold" data-min="2" data-phase="Share">Share</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="quizContainer" class="grid lg:grid-cols-2 gap-6"></div>
+</section>
+
+<!-- ============ TAB 4: CHECKLIST & TRI ============ -->
+<section id="tab-checklist" class="tab-panel hidden space-y-8">
+  <div class="card p-6">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <h2 class="flex items-center gap-2 text-lg font-bold"><i data-lucide="filter" class="w-5 h-5 text-brand-600"></i>Guia de Eliminação de Distratores</h2>
+      <div class="flex gap-2" id="distFilters">
+        <button data-d="todos" class="df-btn active text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600">Todos</button>
+        <button data-d="extrapolacao" class="df-btn text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600">Falsa Verdade</button>
+        <button data-d="inversor" class="df-btn text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600">Inversor</button>
+        <button data-d="generalista" class="df-btn text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600">Generalista</button>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm" id="distTable">
+        <thead><tr class="text-left text-xs uppercase tracking-widest text-slate-500 border-b border-slate-200 dark:border-slate-700">
+          <th class="py-3 pr-4">Perfil</th><th class="py-3 pr-4">Gatilho de Identificação</th><th class="py-3 pr-4">Ação Recomendada</th><th class="py-3">Exemplo</th>
+        </tr></thead>
+        <tbody class="divide-y divide-slate-100 dark:divide-slate-700/60"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card p-6">
+    <h2 class="flex items-center gap-2 text-lg font-bold mb-4"><i data-lucide="list-checks" class="w-5 h-5 text-brand-600"></i>Protocolo Prático do 2º Dia</h2>
+    <ol class="space-y-4" id="protocolList"></ol>
+  </div>
+
+  <div class="grid sm:grid-cols-3 gap-4">
+    <div class="card p-5"><i data-lucide="clock" class="w-6 h-6 text-brand-600 mb-2"></i><h3 class="font-bold text-sm">Gestão de Tempo</h3><p class="text-xs mt-1 text-slate-500 dark:text-slate-400">Média de 3 min/questão. Técnica do "Comando Primeiro": leia a pergunta antes do texto-suporte longo.</p></div>
+    <div class="card p-5"><i data-lucide="ruler" class="w-6 h-6 text-brand-600 mb-2"></i><h3 class="font-bold text-sm">Análise Dimensional</h3><p class="text-xs mt-1 text-slate-500 dark:text-slate-400">Esqueceu a fórmula? Use as unidades: se a resposta é em Watts (J/s), divida Joules pelo tempo em segundos.</p></div>
+    <div class="card p-5"><i data-lucide="pencil-line" class="w-6 h-6 text-brand-600 mb-2"></i><h3 class="font-bold text-sm">Cartão-Resposta</h3><p class="text-xs mt-1 text-slate-500 dark:text-slate-400">Reserve os últimos 20–30 minutos exclusivamente para transcrever o gabarito com calma.</p></div>
+  </div>
+
+  <div class="card p-6 flex flex-wrap items-center justify-between gap-4">
+    <div><h3 class="font-extrabold">📄 Checklist de Estudos da Reta Final (imprimível)</h3><p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Versão otimizada para impressão/PDF com caixas de seleção por componente.</p></div>
+    <a href="checklist.html" class="px-5 py-2.5 rounded-xl bg-brand-600 text-white text-sm font-bold hover:bg-brand-700 flex items-center gap-2"><i data-lucide="external-link" class="w-4 h-4"></i>Abrir Checklist</a>
+  </div>
+</section>
+
+</main>
+
+<footer class="border-t border-slate-200 dark:border-slate-700 py-6 text-center text-xs text-slate-500 dark:text-slate-400">
+  Plano de Aula "Raio-X Estratégico" · Curso Preparatório ENEM Comunitário · Dados de frequência: série histórica ENEM 2015–2025
+</footer>
+<script>
+/* ================= DADOS (mapa_calor.csv) ================= */
+const HEAT=[
+["Biologia","Ecologia","Impactos Ambientais e Poluição",14.5,"Muito Alta","#D9534F","C3-H8, C3-H10, C3-H11","Avaliar perturbações ambientais, poluição, eutrofização e propor medidas mitigadoras e sustentáveis."],
+["Física","Eletricidade","Circuitos Elétricos e Eletrodinâmica",12.0,"Muito Alta","#D9534F","C2-H5, C2-H6","Analisar circuitos elétricos, associação de resistores, corrente, tensão, potência e consumo de energia."],
+["Química","Físico-Química","Estequiometria e Concentração de Soluções",11.2,"Muito Alta","#D9534F","C7-H24, C7-H25","Calcular relações quantitativas de massa/mol e concentração de soluções em processos químicos e industriais."],
+["Física","Ondulatória","Fenômenos Ondulatórios e Acústica",9.8,"Alta","#F0AD4E","C1-H1, C1-H3","Interpretar refração, difração, interferência, ressonância, eco e cancelamento de ruído em ondas sonoras e eletromagnéticas."],
+["Química","Química Geral e Ambiental","Separação de Misturas e Tratamento de Água",8.5,"Alta","#F0AD4E","C7-H24, C3-H10","Identificar e comparar processos de separação de fases (floculação, decantação, filtração, destilação) e purificação de água."],
+["Biologia","Ecologia","Cadeias Alimentares e Fluxo de Energia",8.2,"Alta","#F0AD4E","C3-H8, C3-H9","Compreender as relações tróficas entre produtores, consumidores e decompositores e a eficiência de transferência energética."],
+["Biologia","Citologia","Metabolismo Celular e Organelas",7.8,"Alta","#F0AD4E","C4-H13, C4-H14","Relacionar a ultrastrutura celular e funções de organelas (mitocôndrias, cloroplastos, citoesqueleto) à respiração e fotossíntese."],
+["Química","Química Orgânica","Funções Orgânicas e Propriedades Físicas",7.5,"Alta","#F0AD4E","C7-H24, C7-H25","Reconhecer grupos funcionais, polaridade, interações intermoleculares e pontos de ebulição/solubilidade de compostos orgânicos."],
+["Física","Mecânica","Conservação de Energia e Trabalho",7.2,"Média","#FFD166","C2-H5, C2-H6","Aplicar o princípio de conservação e transformação da energia mecânica (cinética e potencial) e cálculo de trabalho."],
+["Química","Físico-Química","Termoquímica e Cinética Química",7.0,"Média","#FFD166","C7-H25, C7-H26","Calcular variação de entalpia (ΔH) e analisar fatores que alteram a velocidade de reações químicas (temperatura, catalisadores)."],
+["Química","Físico-Química","Equilíbrio Químico e pH/pKa",6.8,"Média","#FFD166","C7-H25, C7-H27","Avaliar deslocamentos de equilíbrio (Princípio de Le Chatelier), constante de acidez e variação de pH/pKa em soluções."],
+["Biologia","Genética e Biotecnologia","Biotecnologia e Engenharia Genética",6.5,"Média","#FFD166","C4-H15, C4-H16","Compreender técnicas modernas de DNA recombinante, PCR, clonagem, terapia gênica, OGM e testes de paternidade."],
+["Física","Termofísica","Calorimetria e Propagação do Calor",6.4,"Média","#FFD166","C2-H5, C2-H7","Calcular trocas de calor sensível/latente e analisar processos de condução, convecção e radiação térmica em sistemas."],
+["Biologia","Ecologia","Ciclos Biogeoquímicos",6.1,"Média","#FFD166","C3-H8","Analisar a circulação de elementos químicos (Carbono, Nitrogênio, Água, Fósforo) no ecossistema e o impacto de queimadas/combustíveis."],
+["Química","Físico-Química","Eletroquímica (Pilhas, Eletrólise e Corrosão)",5.8,"Média","#FFD166","C7-H24, C7-H26","Analisar potenciais de oxirredução, funcionamento de baterias, corrosão de metais e proteção anódica."],
+["Biologia","Fisiologia e Saúde","Imunologia, Vacinas e Soros",5.5,"Baixa","#5CB85C","C4-H14, C8-H28","Diferenciar imunização ativa (vacinas) e passiva (soros) e compreender a resposta imune humoral e celular."],
+["Química","Química Geral","Transformações e Ligações Químicas",5.2,"Baixa","#5CB85C","C7-H24","Correlacionar o tipo de ligação química (iónica, covalente, metálica) às propriedades físicas e químicas das substâncias."],
+["Biologia","Fisiologia e Saúde","Parasitoses e Saúde Pública",5.0,"Baixa","#5CB85C","C8-H28, C8-H30","Identificar agentes etiológicos, vetores, ciclos biológicos de viroses, bacterioses, protozooses e profilaxia de doenças."],
+["Biologia","Genética e Biotecnologia","Genética Mendeliana e Molecular",4.8,"Baixa","#5CB85C","C4-H13, C4-H15","Interpretar heredogramas, probabilidade genética, doação de sangue (sistema ABO/Rh) e síntese de proteínas."],
+["Química","Química Orgânica","Reações Orgânicas e Polímeros",4.5,"Baixa","#5CB85C","C7-H26, C3-H10","Analisar reações de esterificação, saponificação (sabões e detergentes), polimerização e biodegradação."],
+["Física","Mecânica","Impulso, Colisões e Leis de Newton",4.5,"Baixa","#5CB85C","C2-H5","Analisar variação de quantidade de movimento, força de impacto em acidentes e dispositivos de segurança veicular (airbag/pneus)."],
+["Física","Eletricidade","Eletromagnetismo e Indução Magnética",4.2,"Baixa","#5CB85C","C2-H6, C2-H7","Compreender indução eletromagnética (Lei de Faraday), geradores de usinas elétricas e transformação de fluxo magnético em força eletromotriz."],
+["Física","Óptica","Óptica Geométrica e Lentes Corretivas",4.0,"Baixa","#5CB85C","C1-H1, C1-H2","Analisar a propagação retilínea da luz, refração em lentes e espelhos e correção de defeitos de visão (miopia e hipermetropia)."]
+];
+
+/* ================= TEMA CLARO/ESCURO ================= */
+const root=document.documentElement;
+if(localStorage.theme==='dark'||(!('theme' in localStorage)&&matchMedia('(prefers-color-scheme: dark)').matches))root.classList.add('dark');
+document.getElementById('darkToggle').onclick=()=>{root.classList.toggle('dark');localStorage.theme=root.classList.contains('dark')?'dark':'light';};
+
+/* ================= ABAS ================= */
+document.querySelectorAll('.tab-btn').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.add('hidden'));
+  const p=document.getElementById('tab-'+b.dataset.tab);p.classList.remove('hidden');p.classList.remove('fade-in');void p.offsetWidth;p.classList.add('fade-in');
+});
+
+/* ================= GRÁFICOS ================= */
+const isDark=()=>root.classList.contains('dark');
+const txt=()=>isDark()?'#cbd5e1':'#475569';
+new Chart(chartRosca,{type:'doughnut',data:{labels:['Biologia','Química','Física'],datasets:[{data:[33.3,33.3,33.3],backgroundColor:['#10b981','#8b5cf6','#3b82f6'],borderWidth:3,borderColor:'rgba(255,255,255,.8)'}]},options:{cutout:'62%',plugins:{legend:{position:'bottom',labels:{color:txt(),font:{weight:'bold'}}},tooltip:{callbacks:{label:c=>` ${c.label}: ${c.parsed}% (~15 questões)`}}}});
+new Chart(chartTRI,{type:'bar',data:{labels:['Fáceis','Médias','Difíceis'],datasets:[{label:'% estimado da prova',data:[30,50,20],backgroundColor:['#10b981','#f59e0b','#ef4444'],borderRadius:10}]},options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>[' Garantia absoluta — zona TRI crítica',' Maior ganho de pontuação',' Resolver por último'][c.dataIndex]]}}},scales:{x:{max:60,ticks:{color:txt(),callback:v=>v+'%'},grid:{color:'rgba(148,163,184,.15)'}},y:{ticks:{color:txt(),font:{weight:'bold'}},grid:{display:false}}}}});
+
+/* ================= MAPA DE CALOR ================= */
+const grid=document.getElementById('heatGrid');
+function renderHeat(f){
+  grid.innerHTML='';
+  HEAT.filter(r=>f==='Todas'||r[0]===f).forEach(r=>{
+    const d=document.createElement('button');
+    d.className='heat-card text-left rounded-xl p-4 text-white relative overflow-hidden';
+    d.style.background=`linear-gradient(135deg, ${r[5]} 0%, ${r[5]}dd 100%)`;
+    d.innerHTML=`<div class="flex justify-between items-start gap-2"><span class="text-[10px] font-black uppercase tracking-widest opacity-90">${r[0]} · ${r[1]}</span><span class="text-lg font-black">${r[3].toFixed(1)}%</span></div><p class="font-bold text-sm mt-1 leading-snug">${r[2]}</p><div class="mt-2 h-1.5 bg-white/30 rounded-full"><div class="h-full bg-white rounded-full" style="width:${r[3]/14.5*100}%"></div></div><p class="text-[10px] mt-2 opacity-90 font-semibold">${r[4]} · ${r[6]}</p>`;
+    d.onclick=()=>openHeatModal(r);grid.appendChild(d);
+  });
+}
+renderHeat('Todas');
+document.querySelectorAll('.hf-btn').forEach(b=>b.onclick=()=>{document.querySelectorAll('.hf-btn').forEach(x=>x.classList.remove('active','bg-brand-600','text-white'));b.classList.add('active','bg-brand-600','text-white');renderHeat(b.dataset.f);});
+document.querySelector('.hf-btn').classList.add('bg-brand-600','text-white');
+function openHeatModal(r){
+  hmDisc.textContent=r[0]+' · '+r[1];hmTitle.textContent=r[2];hmSub.textContent='Nível de calor: '+r[4];
+  hmFreq.textContent='Frequência: '+r[3].toFixed(1)+'%';hmFreq.style.background=r[5];hmFreq.style.color='#fff';
+  hmComp.textContent='Competências: '+r[6];hmDesc.textContent=r[7];
+  heatModal.classList.remove('hidden');lucide.createIcons();
+}
+hmClose.onclick=()=>heatModal.classList.add('hidden');
+heatModal.onclick=e=>{if(e.target===heatModal)heatModal.classList.add('hidden')};
+
+/* ================= EUTROFIZAÇÃO ================= */
+const EUTRO=[
+['🧪','Excesso de nutrientes','Efluentes ricos em nitratos e fosfatos (agricultura + esgoto) chegam ao corpo d\'água lêntico.'],
+['🌿','Bloom de algas','Proliferação explosiva de algas superficiais (eutrofização) forma uma camada densa na superfície.'],
+['🌑','Bloqueio da luz','A camada de algas impede a penetração da luz solar → fotossíntese nas camadas profundas cessa.'],
+['🦠','Decomposição aeróbica','Decompositores consomem a matéria orgânica morta usando o oxigênio dissolvido na água.'],
+['☠️','Anoxia e mortandade','Esgotamento do O₂ dissolvido causa a morte de peixes e organismos aeróbicos (anoxia).']
+];
+const chain=document.getElementById('eutroChain');
+EUTRO.forEach((s,i)=>{
+  const b=document.createElement('button');
+  b.className='flex-1 text-left rounded-xl border-2 border-slate-200 dark:border-slate-600 p-4 transition hover:border-brand-500';
+  b.innerHTML=`<div class="text-2xl">${s[0]}</div><p class="font-bold text-sm mt-1">${i+1}. ${s[1]}</p><p class="desc hidden text-xs mt-2 text-slate-500 dark:text-slate-400 leading-relaxed">${s[2]}</p>`;
+  b.onclick=()=>{b.querySelector('.desc').classList.toggle('hidden');b.classList.toggle('border-brand-500');b.classList.toggle('bg-brand-50');b.classList.toggle('dark:bg-slate-700/40')};
+  chain.appendChild(b);
+  if(i<EUTRO.length-1){const a=document.createElement('div');a.className='hidden lg:flex items-center text-brand-500 font-black';a.textContent='→';chain.appendChild(a);}
+});
+
+/* ================= QUIZ TPS ================= */
+const QUIZ=[
+{id:1,nivel:'Fácil',cor:'emerald',foco:'Físico-Química / Separação de Misturas',
+ enunciado:'Na etapa final do pré-tratamento de efluentes, flocos formados por agente coagulante precisam ser separados da fase líquida em um tanque sem agitação.',
+ pergunta:'Qual é a propriedade física determinante para o sucesso dessa separação gravitacional?',
+ alts:['Ponto de ebulição do solvente.','Dificuldade de solubilidade de gases.','Diferença de densidade entre o floco e a água.','Pressão de vapor da mistura.','Viscosidade cinemática do fluido.'],
+ gab:2,
+ comentario:'A decantação é um processo físico de separação fundamentado na ação da gravidade sobre partículas com densidade superior à do meio aquoso: Peso > Empuxo, logo o floco sedimenta.',
+ distrator:'Distrator típico: alternativas A ou E — termos técnicos (ponto de ebulição, viscosidade) que atraem quem busca respostas complexas, violando a simplicidade de um item classificado como FÁCIL na TRI.'},
+{id:2,nivel:'Médio',cor:'amber',foco:'Ecologia / Química Ambiental',
+ enunciado:'O descarte inadequado de efluentes ricos em nitratos e fosfatos em corpos d\'água lênticos deflagra um processo de contaminação que culmina na mortandade de peixes devido à anoxia.',
+ pergunta:'Qual sequência de eventos descreve corretamente esse processo ecológico?',
+ alts:['Acidificação direta da água → precipitação de metais → morte celular.','Proliferação de algas superficiais → bloqueio da luz solar → decomposição aeróbica → esgotamento do oxigênio dissolvido.','Aumento da salinidade → osmose inversa nos peixes → desidratação aquática.','Reação do nitrato com o cloro → formação de gás tóxico → sufocamento imediato.','Bloqueio dos estômatos vegetais → interrupção da transpiração → seca do reservatório.'],
+ gab:1,
+ comentario:'O processo é a eutrofização antropogênica: o excesso de nutrientes gera um "bloom" de algas que impede a fotossíntese nas camadas profundas; os decompositores aeróbicos então consomem o oxigênio dissolvido até a anoxia.',
+ distrator:'Distrator típico: alternativa D — associa conceitos de química corretos isoladamente (nitrato, cloro), mas falsos para o fenômeno ecológico em questão (perfil "Falsa Verdade").'}
+];
+const qc=document.getElementById('quizContainer');
+QUIZ.forEach(q=>{
+  const c=document.createElement('div');c.className='card p-6';
+  c.innerHTML=`<div class="flex items-center gap-2 flex-wrap"><span class="text-[11px] font-black px-2.5 py-1 rounded-lg bg-${q.cor}-100 dark:bg-${q.cor}-900/40 text-${q.cor}-700 dark:text-${q.cor}-300 uppercase tracking-widest">Questão ${q.id} · Nível ${q.nivel}</span><span class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">${q.foco}</span></div>
+  <p class="mt-3 text-sm leading-relaxed">${q.enunciado}</p>
+  <p class="mt-2 text-sm font-bold">${q.pergunta}</p>
+  <div class="mt-3 space-y-2 alts"></div>
+  <div class="mt-4 flex gap-2 flex-wrap">
+    <button class="btn-gab px-4 py-2 rounded-xl bg-brand-600 text-white text-xs font-bold hover:bg-brand-700">✅ Gabarito Comentado</button>
+    <button class="btn-dist px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-700">🔍 Análise dos Distratores</button>
+  </div>
+  <div class="fb-gab hidden mt-4 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-sm leading-relaxed"><strong>Gabarito: ${'ABCDE'[q.gab]})</strong> ${q.comentario}</div>
+  <div class="fb-dist hidden mt-4 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-sm leading-relaxed">${q.distrator}</div>`;
+  const box=c.querySelector('.alts');
+  q.alts.forEach((a,i)=>{
+    const b=document.createElement('button');b.className='alt-btn';b.textContent=`${'ABCDE'[i]}) ${a}`;
+    b.onclick=()=>{box.querySelectorAll('.alt-btn').forEach(x=>x.classList.remove('correct','wrong'));b.classList.add(i===q.gab?'correct':'wrong');};
+    box.appendChild(b);
+  });
+  c.querySelector('.btn-gab').onclick=e=>{c.querySelector('.fb-gab').classList.toggle('hidden');};
+  c.querySelector('.btn-dist').onclick=e=>{c.querySelector('.fb-dist').classList.toggle('hidden');};
+  qc.appendChild(c);
+});
+document.querySelectorAll('.eta-q').forEach(b=>b.onclick=()=>{document.querySelector('[data-tab="desafio"]').click();setTimeout(()=>{document.querySelectorAll('#quizContainer > div')[+b.dataset.q-1].scrollIntoView({behavior:'smooth',block:'center'})},150);});
+
+/* ================= CRONÔMETRO ================= */
+let tInt=null,tSec=120;
+const fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+function setTimer(min,phase){clearInterval(tInt);tInt=null;tSec=min*60;timerDisplay.textContent=fmt(tSec);timerPhase.textContent=phase;timerStart.textContent='▶ Iniciar';}
+document.querySelectorAll('.phase-btn').forEach(b=>b.onclick=()=>setTimer(+b.dataset.min,b.dataset.phase));
+timerStart.onclick=()=>{
+  if(tInt){clearInterval(tInt);tInt=null;timerStart.textContent='▶ Retomar';return;}
+  timerStart.textContent='⏸ Pausar';
+  tInt=setInterval(()=>{tSec--;timerDisplay.textContent=fmt(Math.max(tSec,0));
+    if(tSec<=0){clearInterval(tInt);tInt=null;timerStart.textContent='▶ Iniciar';timerDisplay.classList.add('text-rose-500');setTimeout(()=>timerDisplay.classList.remove('text-rose-500'),3000);}},1000);
+};
+
+/* ================= DISTRATORES ================= */
+const DIST=[
+{k:'extrapolacao',perfil:'A Falsa Verdade (Extrapolação)',gatilho:'Afirmação perfeita na teoria, mas sem amparo no texto-suporte.',acao:'Volte ao comando da questão e verifique o texto. Se o texto não cita, elimine.',ex:'"O cloro mata vírus" — verdade científica, mas o texto tratava de eutrofização.'},
+{k:'inversor',perfil:'O Inversor de Causa e Efeito (Contradição)',gatilho:'Inverte a relação de causalidade (ex.: diz que a temperatura subiu por causa da pressão).',acao:'Escreva no rascunho: [CAUSA] → [EFEITO] e compare com o texto.',ex:'"A anoxia causou o bloom de algas" — na verdade, o bloom antecede e induz a anoxia.'},
+{k:'generalista',perfil:'O Generalista Absoluto (Reducionismo)',gatilho:'Uso de palavras restritivas: "sempre", "nunca", "exclusivamente", "único".',acao:'Desconfie imediatamente. Fenômenos biológicos e químicos raramente são absolutos.',ex:'"A poluição é causada exclusivamente pela indústria" — fenômeno multifatorial reduzido a uma variável.'}
+];
+function renderDist(f){
+  const tb=document.querySelector('#distTable tbody');tb.innerHTML='';
+  DIST.filter(d=>f==='todos'||d.k===f).forEach(d=>{
+    const tr=document.createElement('tr');tr.className='align-top fade-in';
+    tr.innerHTML=`<td class="py-3 pr-4 font-bold text-sm">${d.perfil}</td><td class="py-3 pr-4 text-sm text-slate-600 dark:text-slate-300">${d.gatilho}</td><td class="py-3 pr-4 text-sm text-slate-600 dark:text-slate-300">${d.acao}</td><td class="py-3 text-xs italic text-slate-500 dark:text-slate-400">${d.ex}</td>`;
+    tb.appendChild(tr);
+  });
+}
+renderDist('todos');
+document.querySelectorAll('.df-btn').forEach(b=>b.onclick=()=>{document.querySelectorAll('.df-btn').forEach(x=>x.classList.remove('bg-brand-600','text-white'));b.classList.add('bg-brand-600','text-white');renderDist(b.dataset.d);});
+document.querySelector('.df-btn').classList.add('bg-brand-600','text-white');
+
+/* ================= PROTOCOLO ================= */
+const PROT=[
+['Passagem de Olho Estratégica (primeiros 10 min)','Folheie a prova de Ciências da Natureza e classifique cada questão com uma letra ao lado do número: F (Fácil), M (Média) e D (Difícil).'],
+['Garantia do TRI','Resolva todas as questões F e M primeiro. Deixe os cálculos extensos de Físico-Química e circuitos complexos para a etapa final.'],
+['Técnica de Análise Dimensional','Esqueceu a fórmula? Analise as unidades no enunciado e nas opções. Se a resposta é em Watts (W = J/s), divida o valor em Joules pelo tempo em segundos.'],
+['Preenchimento do Cartão-Resposta','Reserve os últimos 20 a 30 minutos exclusivamente para a marcação do gabarito, com calma e conferência.']
+];
+const pl=document.getElementById('protocolList');
+PROT.forEach((p,i)=>{
+  const li=document.createElement('li');li.className='flex gap-4 items-start';
+  li.innerHTML=`<span class="shrink-0 w-9 h-9 rounded-xl bg-brand-600 text-white font-black flex items-center justify-center">${i+1}</span><div><p class="font-bold text-sm">${p[0]}</p><p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">${p[1]}</p></div>`;
+  pl.appendChild(li);
+});
+
+lucide.createIcons();
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
