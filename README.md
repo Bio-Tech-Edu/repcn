@@ -12,6 +12,7 @@ Ecossistema digital interativo para aula preparatória do ENEM, baseado no plano
 ├── index.html       → Aplicação web interativa (dashboard + estudo de caso + simulação + checklist TRI)
 ├── checklist.html   → Guia de Estudos da Reta Final (otimizado para impressão/PDF via @media print)
 ├── mapa_calor.csv   → Base de dados: frequência relativa de temas ENEM 2015–2025 (fonte do heatmap)
+├── Docs             → Documentos de planejamento da aula e atividades complementares
 └── README.md        → Este arquivo
 ```
 
