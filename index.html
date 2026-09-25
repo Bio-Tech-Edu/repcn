@@ -84,6 +84,18 @@ tailwind.config = {
 
   .skip-link{position:absolute;left:-999px;top:0;background:#fff;color:#000;padding:.6rem 1rem;z-index:100;border-radius:0 0 8px 0}
   .skip-link:focus{left:0}
+
+  /* ================= FOOTER ================= */
+.site-footer{padding:2rem 1rem 3rem;text-align:center;border-top:1px solid var(--border);
+  margin-top:3rem;color:var(--text-muted);font-size:.85rem}
+.site-footer .logos{display:flex;justify-content:center;align-items:center;gap:1.5rem;margin-bottom:1rem;flex-wrap:wrap}
+.site-footer .logos img{height:50px;object-fit:contain;opacity:.92;background:rgba(255,255,255,.92);padding:6px 10px;border-radius:8px}
+.site-footer a{color:var(--primary);text-decoration:none}
+.site-footer a:hover{text-decoration:underline}
+
+/* ================= VIDEO ================= */
+.video-wrap{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(--radius);margin:1rem 0}
+.video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
 </style>
 </head>
 <body class="min-h-screen" style="background:var(--paper);color:var(--ink)">
@@ -133,14 +145,14 @@ tailwind.config = {
   <div class="grid md:grid-cols-5 gap-5">
     <div class="panel p-6 md:col-span-2">
       <h2 class="font-display text-lg font-semibold">Panorama geral da prova</h2>
-      <p class="text-sm mt-1" style="color:var(--ink-soft)">Proporção de questões por componente · ENEM 2015–2025</p>
+      <p class="text-sm mt-1" style="color:var(--ink-soft)">Proporção de questões por componente · ENEM 2014–2024</p>
       <div class="relative h-60 mt-4"><canvas id="chartRosca" role="img" aria-label="Gráfico de rosca: Biologia, Química e Física dividem igualmente as 45 questões de Ciências da Natureza, 33,3% cada"></canvas></div>
       <p class="mt-4 text-xs leading-relaxed" style="color:var(--ink-soft)">Distribuição equilibrada: <strong style="color:var(--ink)">15 questões</strong> de cada componente nas 45 de Ciências da Natureza. Nenhuma área pode ser negligenciada.</p>
     </div>
 
     <div class="panel p-6 md:col-span-3">
-      <h2 class="font-display text-lg font-semibold">Dificuldade × TRI</h2>
-      <p class="text-sm mt-1" style="color:var(--ink-soft)">Errar fáceis e acertar difíceis é penalizado como inconsistência pela Teoria de Resposta ao Item.</p>
+      <h2 class="font-display text-lg font-semibold">Matriz de nível de complexidade em questão × TRI</h2>
+      <p class="text-sm mt-1" style="color:var(--ink-soft)">Errar fáceis e acertar difíceis é penalizado como inconsistência pela <strong>Teoria de Resposta ao Item (TRI)</strong>. Ou seja, a TRI mede a <i>coerência pedagógica do estudante</i>. <br> · Acertar questões difíceis e errar questões fáceis gera penalização por "inconsistência/chute". <br> · Prioridade estratégica absoluta: Garantir o acerto em todas as questões classificadas como fáceis e médias. </p>
       <div class="relative h-60 mt-4"><canvas id="chartTRI" role="img" aria-label="Gráfico de barras: 30% das questões são fáceis, 50% médias e 20% difíceis"></canvas></div>
       <div class="mt-4 grid sm:grid-cols-3 gap-3 text-xs">
         <div class="rounded-lg p-3" style="border:1px solid var(--line);background:color-mix(in srgb, var(--easy) 10%, var(--paper-raised))"><i data-lucide="shield-check" class="w-4 h-4 mb-1" style="color:var(--easy)" aria-hidden="true"></i><strong>Fáceis (~30%):</strong> zona de garantia. Errar aqui derruba sua régua TRI.</div>
@@ -154,13 +166,13 @@ tailwind.config = {
     <div class="flex flex-wrap items-center justify-between gap-3">
       <h2 class="font-display text-lg font-semibold">Mapa de calor temático</h2>
       <div class="flex gap-2 flex-wrap" id="heatFilters">
-        <button data-f="Todas" class="hf-btn text-xs font-semibold px-3 py-1.5 rounded-lg" style="border:1px solid var(--line)">Todas</button>
         <button data-f="Biologia" class="hf-btn text-xs font-semibold px-3 py-1.5 rounded-lg" style="border:1px solid var(--line)">Biologia</button>
-        <button data-f="Química" class="hf-btn text-xs font-semibold px-3 py-1.5 rounded-lg" style="border:1px solid var(--line)">Química</button>
         <button data-f="Física" class="hf-btn text-xs font-semibold px-3 py-1.5 rounded-lg" style="border:1px solid var(--line)">Física</button>
+        <button data-f="Química" class="hf-btn text-xs font-semibold px-3 py-1.5 rounded-lg" style="border:1px solid var(--line)">Química</button>
+        <button data-f="Todas" class="hf-btn text-xs font-semibold px-3 py-1.5 rounded-lg" style="border:1px solid var(--line)">Todas</button>
       </div>
     </div>
-    <p class="text-sm mt-1" style="color:var(--ink-soft)">Clique em um tema para ver as competências BNCC/ENEM associadas. A intensidade da cor indica a frequência relativa de cobrança, 2015–2025.</p>
+    <p class="text-sm mt-1" style="color:var(--ink-soft)">Clique em um tema para ver as competências BNCC/ENEM associadas. A intensidade da cor indica a frequência relativa de cobrança, 2014–2024.</p>
     <div class="flex flex-wrap gap-4 mt-4 mb-1 text-xs font-medium">
       <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm" style="background:#D9534F"></span>Muito alta</span>
       <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm" style="background:#F0AD4E"></span>Alta</span>
@@ -302,8 +314,15 @@ tailwind.config = {
 
 </main>
 
-<footer class="py-6 text-center text-xs" style="border-top:1px solid var(--line);color:var(--ink-soft)">
-  Plano de aula "Raio-X Estratégico" · Curso preparatório ENEM comunitário · Dados de frequência: série histórica ENEM 2015–2025
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="logos">
+    <img src="assets/biotech_edudesign.png" alt="Bio+Tech EduDesign">
+    <img src="assets/pre_enem.png" alt="Pré-Enem Digit@l MT">
+    <img src="assets/gov_mato_grosso.png" alt="Governo do Estado de Mato Grosso">
+  </div>
+  <p><strong>Projeto Pré-Enem Digit@l MT 2026 · Aulão em Juscimeira-MT · Dados de frequência: série histórica INEP/ENEM 2014–2024</strong></p>
+  <p>Desenvolvido por <a href="https://github.com/bio-tech-edu">Bio+Tech EduDesign</a> · Apoio institucional <strong>Governo do Estado de Mato Grosso</strong></p>
 </footer>
 
 <script>
