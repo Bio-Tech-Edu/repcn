@@ -29,13 +29,14 @@
   .btnbar{display:flex;gap:10px;margin:18px 0 30px}
   .btnbar button,.btnbar a{background:var(--fis);color:#fff;border:none;padding:10px 18px;border-radius:8px;font-weight:600;cursor:pointer;text-decoration:none;font-size:.85rem;font-family:inherit}
   .btnbar a{background:var(--ink)}
-  footer{margin-top:44px;font-size:.75rem;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:14px}
-  @media print{
-    body{padding:0;max-width:none;font-size:11pt}
-    .btnbar{display:none}
-    h2{page-break-after:avoid}
-    table,ul.cb li{page-break-inside:avoid}
-    @page{margin:1.6cm}
+
+  /* ================= FOOTER ================= */
+  .site-footer{padding:2rem 1rem 3rem;text-align:center;border-top:1px solid var(--line);
+    margin-top:3rem;color:var(--ink-soft);font-size:.85rem}
+  .site-footer .logos{display:flex;justify-content:center;align-items:center;gap:1.5rem;margin-bottom:1rem;flex-wrap:wrap}
+  .site-footer .logos img{height:50px;object-fit:contain;opacity:.92;background:rgba(255,255,255,.92);padding:6px 10px;border-radius:8px}
+  .site-footer a{color:var(--fis);text-decoration:none}
+  .site-footer a:hover{text-decoration:underline}
   }
 </style>
 </head>
@@ -101,8 +102,15 @@
   <li><strong>Preenchimento do cartão-resposta:</strong> reserve os últimos 20 a 30 minutos exclusivamente para a marcação do gabarito com calma.</li>
 </ol>
 
-<footer>
-  Material de apoio do plano de aula "Raio-X Estratégico — Decodificando o 2º Dia do ENEM" · Curso preparatório ENEM comunitário · distribuição via e-mail institucional.
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="logos">
+    <img src="assets/biotech_edudesign.png" alt="Bio+Tech EduDesign">
+    <img src="assets/pre_enem.png" alt="Pré-Enem Digit@l MT">
+    <img src="assets/gov_mato_grosso.png" alt="Governo do Estado de Mato Grosso">
+  </div>
+  <p><strong>Projeto Pré-Enem Digit@l MT 2026 · Aulão em Juscimeira-MT | Material de apoio · Dados de frequência: série histórica INEP/ENEM 2014–2024</strong></p>
+  <p>Desenvolvido por <a href="https://github.com/bio-tech-edu">Bio+Tech EduDesign</a> · Apoio institucional <strong>Governo do Estado de Mato Grosso</strong></p>
 </footer>
 
 </body>
